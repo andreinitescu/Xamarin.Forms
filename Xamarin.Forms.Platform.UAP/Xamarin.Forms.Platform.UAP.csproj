@@ -43,6 +43,9 @@
     </NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ButtonBaseRenderer.cs" />
+    <Compile Include="FormsCheckBox.cs" />
+    <Compile Include="CheckBoxRenderer.cs" />
     <Compile Include="AccessibilityExtensions.cs" />
     <Compile Include="IImageVisualElementRenderer.cs" />
     <Compile Include="ImageButtonRenderer.cs" />
@@ -58,6 +61,7 @@
     <Compile Include="FormsSlider.cs" />
     <Compile Include="FormsTextBox.cs" />
     <Compile Include="FormsComboBox.cs" />
+    <Compile Include="IFormsButtonBase.cs" />
     <Compile Include="ITabStopOnDescendants.cs" />
     <Compile Include="ImageElementManager.cs" />
     <Compile Include="InterceptVisualStateManager.cs" />

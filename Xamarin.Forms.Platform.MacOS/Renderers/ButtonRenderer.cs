@@ -5,30 +5,16 @@ using Foundation;
 
 namespace Xamarin.Forms.Platform.MacOS
 {
-	public class ButtonRenderer : ViewRenderer<Button, NSButton>
+	public class ButtonBaseRenderer<TButton, TNSButton> : ViewRenderer<TButton, TNSButton>
+		where TButton : Button
+		where TNSButton : NSButton, IFormsNSButton, new()
 	{
-		class FormsNSButton : NSButton
-		{
-			public event Action Pressed;
-
-			public event Action Released;
-
-			public override void MouseDown(NSEvent theEvent)
-			{
-				Pressed?.Invoke();
-
-				base.MouseDown(theEvent);
-
-				Released?.Invoke();
-			}
-		}
-
 		protected override void Dispose(bool disposing)
 		{
 			if (Control != null)
 				Control.Activated -= OnButtonActivated;
 
-			var formsButton = Control as FormsNSButton;
+			IFormsNSButton formsButton = Control;
 			if (formsButton != null)
 			{
 				formsButton.Pressed -= HandleButtonPressed;
@@ -38,7 +24,7 @@ namespace Xamarin.Forms.Platform.MacOS
 			base.Dispose(disposing);
 		}
 
-		protected override void OnElementChanged(ElementChangedEventArgs<Button> e)
+		protected override void OnElementChanged(ElementChangedEventArgs<TButton> e)
 		{
 			base.OnElementChanged(e);
 
@@ -46,7 +32,7 @@ namespace Xamarin.Forms.Platform.MacOS
 			{
 				if (Control == null)
 				{
-					var btn = new FormsNSButton();
+					TNSButton btn = CreateNativeControl();
 					btn.SetButtonType(NSButtonType.MomentaryPushIn);
 					btn.Pressed += HandleButtonPressed;
 					btn.Released += HandleButtonReleased;
@@ -162,5 +148,36 @@ namespace Xamarin.Forms.Platform.MacOS
 			Element?.SendReleased();
 		}
 
+	}
+
+	public interface IFormsNSButton
+	{
+		event Action Pressed;
+
+		event Action Released;
+	}
+
+	public class ButtonRenderer : ButtonBaseRenderer<Button, FormsNSButton>
+	{
+		protected override FormsNSButton CreateNativeControl()
+		{
+			return new FormsNSButton();
+		}
+	}
+
+	public class FormsNSButton : NSButton, IFormsNSButton
+	{
+		public event Action Pressed;
+
+		public event Action Released;
+
+		public override void MouseDown(NSEvent theEvent)
+		{
+			Pressed?.Invoke();
+
+			base.MouseDown(theEvent);
+
+			Released?.Invoke();
+		}
 	}
 }

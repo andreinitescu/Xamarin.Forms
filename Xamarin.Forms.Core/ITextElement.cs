@@ -2,7 +2,7 @@ using System;
 
 namespace Xamarin.Forms
 {
-	interface ITextElement
+	public interface ITextElement
 	{
 		//note to implementor: implement this property publicly
 		Color TextColor { get; }

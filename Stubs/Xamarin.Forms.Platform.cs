@@ -48,6 +48,9 @@ namespace Xamarin.Forms.Platform
 #endif
 	internal class _ImageRenderer { }
 
+	[RenderWith(typeof(CheckBoxRenderer))]
+	internal class _CheckBoxRenderer { }
+
 	[RenderWith (typeof (ButtonRenderer))]
 	internal class _ButtonRenderer { }
 

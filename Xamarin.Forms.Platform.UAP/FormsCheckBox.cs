@@ -5,12 +5,12 @@ using WContentPresenter = Windows.UI.Xaml.Controls.ContentPresenter;
 
 namespace Xamarin.Forms.Platform.UWP
 {
-	public class FormsButton : Windows.UI.Xaml.Controls.Button, IFormsButtonBase
+	public class FormsCheckBox : Windows.UI.Xaml.Controls.CheckBox, IFormsButtonBase
 	{
-		public static readonly DependencyProperty BorderRadiusProperty = DependencyProperty.Register(nameof(BorderRadius), typeof(int), typeof(FormsButton),
+		public static readonly DependencyProperty BorderRadiusProperty = DependencyProperty.Register(nameof(BorderRadius), typeof(int), typeof(FormsCheckBox),
 			new PropertyMetadata(default(int), OnBorderRadiusChanged));
 
-		public static readonly DependencyProperty BackgroundColorProperty = DependencyProperty.Register(nameof(BackgroundColor), typeof(Brush), typeof(FormsButton),
+		public static readonly DependencyProperty BackgroundColorProperty = DependencyProperty.Register(nameof(BackgroundColor), typeof(Brush), typeof(FormsCheckBox),
 			new PropertyMetadata(default(Brush), OnBackgroundColorChanged));
 
 		WContentPresenter _contentPresenter;
@@ -51,12 +51,12 @@ namespace Xamarin.Forms.Platform.UWP
 
 		static void OnBackgroundColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
-			((FormsButton)d).UpdateBackgroundColor();
+			((FormsCheckBox)d).UpdateBackgroundColor();
 		}
 
 		static void OnBorderRadiusChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
-			((FormsButton)d).UpdateBorderRadius();
+			((FormsCheckBox)d).UpdateBorderRadius();
 		}
 
 		void UpdateBackgroundColor()
@@ -71,8 +71,6 @@ namespace Xamarin.Forms.Platform.UWP
 
 		void UpdateBorderRadius()
 		{
-
-
 			if (_contentPresenter != null)
 				_contentPresenter.CornerRadius = new Windows.UI.Xaml.CornerRadius(BorderRadius);
 		}

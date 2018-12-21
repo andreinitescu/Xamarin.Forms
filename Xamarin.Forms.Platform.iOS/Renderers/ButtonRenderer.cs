@@ -12,13 +12,10 @@ namespace Xamarin.Forms.Platform.iOS
 	public class ButtonRenderer : ViewRenderer<Button, UIButton>, IImageVisualElementRenderer
 	{
 		bool _isDisposed;
-		UIColor _buttonTextColorDefaultDisabled;
-		UIColor _buttonTextColorDefaultHighlighted;
-		UIColor _buttonTextColorDefaultNormal;
-		bool _useLegacyColorManagement;
 		bool _titleChanged;
 		SizeF _titleSize;
 		UIEdgeInsets _paddingDelta = new UIEdgeInsets();
+		TextButtonColorTracker<Button> _textButtonManager;
 
 		// This looks like it should be a const under iOS Classic,
 		// but that doesn't work under iOS 
@@ -61,6 +58,12 @@ namespace Xamarin.Forms.Platform.iOS
 				ImageElementManager.Dispose(this);
 			}
 
+			if (_textButtonManager != null)
+			{
+				_textButtonManager.Dispose();
+				_textButtonManager = null;
+			}
+
 			_isDisposed = true;
 
 			base.Dispose(disposing);
@@ -79,21 +82,17 @@ namespace Xamarin.Forms.Platform.iOS
 					Debug.Assert(Control != null, "Control != null");
 
 					SetControlPropertiesFromProxy();
-
-					_useLegacyColorManagement = e.NewElement.UseLegacyColorManagement();
-
-					_buttonTextColorDefaultNormal = Control.TitleColor(UIControlState.Normal);
-					_buttonTextColorDefaultHighlighted = Control.TitleColor(UIControlState.Highlighted);
-					_buttonTextColorDefaultDisabled = Control.TitleColor(UIControlState.Disabled);
-
 					Control.TouchUpInside += OnButtonTouchUpInside;
 					Control.TouchDown += OnButtonTouchDown;
 				}
 
+				if (_textButtonManager == null)
+				{
+					_textButtonManager = new TextButtonColorTracker<Button>(this);
+				}
+
 				UpdateText();
-				UpdateFont();
 				UpdateImage();
-				UpdateTextColor();
 				UpdatePadding();
 			}
 		}
@@ -109,10 +108,6 @@ namespace Xamarin.Forms.Platform.iOS
 
 			if (e.PropertyName == Button.TextProperty.PropertyName)
 				UpdateText();
-			else if (e.PropertyName == Button.TextColorProperty.PropertyName)
-				UpdateTextColor();
-			else if (e.PropertyName == Button.FontProperty.PropertyName)
-				UpdateFont();
 			else if (e.PropertyName == Button.ImageProperty.PropertyName)
 				UpdateImage();
 			else if (e.PropertyName == Button.PaddingProperty.PropertyName)
@@ -153,12 +148,7 @@ namespace Xamarin.Forms.Platform.iOS
 		{
 			ButtonElementManager.OnButtonTouchDown(this.Element);
 		}
-
-		void UpdateFont()
-		{
-			Control.TitleLabel.Font = Element.ToUIFont();
-		}
-
+		
 		async void UpdateImage()
 		{
 			try
@@ -191,32 +181,9 @@ namespace Xamarin.Forms.Platform.iOS
 
 		void UpdateText()
 		{
-			var newText = Element.Text;
-
-			if (Control.Title(UIControlState.Normal) != newText)
+			if (Control.Title(UIControlState.Normal) != Element.Text)
 			{
-				Control.SetTitle(Element.Text, UIControlState.Normal);
 				_titleChanged = true;
-			}
-		}
-
-		void UpdateTextColor()
-		{
-			if (Element.TextColor == Color.Default)
-			{
-				Control.SetTitleColor(_buttonTextColorDefaultNormal, UIControlState.Normal);
-				Control.SetTitleColor(_buttonTextColorDefaultHighlighted, UIControlState.Highlighted);
-				Control.SetTitleColor(_buttonTextColorDefaultDisabled, UIControlState.Disabled);
-			}
-			else
-			{
-				var color = Element.TextColor.ToUIColor();
-
-				Control.SetTitleColor(color, UIControlState.Normal);
-				Control.SetTitleColor(color, UIControlState.Highlighted);
-				Control.SetTitleColor(_useLegacyColorManagement ? _buttonTextColorDefaultDisabled : color, UIControlState.Disabled);
-
-				Control.TintColor = color;
 			}
 		}
 
@@ -235,7 +202,7 @@ namespace Xamarin.Forms.Platform.iOS
 
 		void UpdateContentEdge(UIButton button, UIEdgeInsets? delta = null)
 		{
-			_paddingDelta = delta ?? new UIEdgeInsets ();
+			_paddingDelta = delta ?? new UIEdgeInsets();
 			UpdatePadding(button);
 		}
 
@@ -246,7 +213,7 @@ namespace Xamarin.Forms.Platform.iOS
 
 			Control.ImageEdgeInsets = new UIEdgeInsets(0, 0, 0, 0);
 			Control.TitleEdgeInsets = new UIEdgeInsets(0, 0, 0, 0);
-			UpdateContentEdge (Control);
+			UpdateContentEdge(Control);
 		}
 
 		void ComputeEdgeInsets(UIButton button, Button.ButtonContentLayout layout)
@@ -261,7 +228,7 @@ namespace Xamarin.Forms.Platform.iOS
 			{
 				button.ImageEdgeInsets = new UIEdgeInsets(0, -spacing, 0, spacing);
 				button.TitleEdgeInsets = new UIEdgeInsets(0, spacing, 0, -spacing);
-				UpdateContentEdge (button, new UIEdgeInsets(0, 2 * spacing, 0, 2 * spacing));
+				UpdateContentEdge(button, new UIEdgeInsets(0, 2 * spacing, 0, 2 * spacing));
 				return;
 			}
 
@@ -280,7 +247,7 @@ namespace Xamarin.Forms.Platform.iOS
 			{
 				button.ImageEdgeInsets = new UIEdgeInsets(0, labelWidth + spacing, 0, -labelWidth - spacing);
 				button.TitleEdgeInsets = new UIEdgeInsets(0, -imageWidth - spacing, 0, imageWidth + spacing);
-				UpdateContentEdge (button, new UIEdgeInsets(0, 2 * spacing, 0, 2 * spacing));
+				UpdateContentEdge(button, new UIEdgeInsets(0, 2 * spacing, 0, 2 * spacing));
 				return;
 			}
 
@@ -289,7 +256,7 @@ namespace Xamarin.Forms.Platform.iOS
 
 			var edgeOffset = (float)Math.Min(imageVertOffset, titleVertOffset);
 
-			UpdateContentEdge (button, new UIEdgeInsets (edgeOffset, 0, edgeOffset, 0));
+			UpdateContentEdge(button, new UIEdgeInsets(edgeOffset, 0, edgeOffset, 0));
 
 			var horizontalImageOffset = labelWidth / 2;
 			var horizontalTitleOffset = imageWidth / 2;
