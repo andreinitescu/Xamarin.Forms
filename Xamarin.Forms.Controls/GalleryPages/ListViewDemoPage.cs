@@ -23,7 +23,7 @@ namespace Xamarin.Forms.Controls
             public Color FavoriteColor { private set; get; }
         };
 
-		class MyDataTemplateSelector : DataTemplateSelector
+		class MyDataTemplateSelector : IDataTemplateSelector
 	    {
 		    DataTemplate _oddTemplate;
 		    DataTemplate _evenTemplate;
@@ -114,7 +114,7 @@ namespace Xamarin.Forms.Controls
 			    });
 		    }
 
-		    protected override DataTemplate OnSelectTemplate (object item, BindableObject container)
+		    public DataTemplate SelectTemplate (object item, BindableObject container)
 		    {
 			    return ((Person)item).Birthday.Month % 2 == 0 ? _evenTemplate : _oddTemplate;
 		    }
@@ -210,7 +210,7 @@ namespace Xamarin.Forms.Controls
                 // Define template for displaying each item.
                 // (Argument of DataTemplate constructor is called for 
                 //      each item; it must return a Cell derivative.)
-                ItemTemplate = new MyDataTemplateSelector ()
+                ItemTemplateSelector = new MyDataTemplateSelector ()
             };
 
 	        listView.Refreshing += async (sender, e) => {

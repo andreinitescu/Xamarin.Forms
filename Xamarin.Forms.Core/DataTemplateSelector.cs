@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Xamarin.Forms
 {
+	[Obsolete("Please use IDataTemplateSelector instead")]
 	public abstract class DataTemplateSelector : DataTemplate
 	{
 		Dictionary<Type, DataTemplate> _dataTemplates = new Dictionary<Type, DataTemplate>();

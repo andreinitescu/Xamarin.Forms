@@ -26,7 +26,7 @@ namespace Xamarin.Forms.Controls.Issues
 			{
 				IsGroupingEnabled = true,
 				ItemTemplate = new DataTemplate(typeof(GroupItemTemplate)),
-				GroupHeaderTemplate = new MyDataTemplateSelector(),
+				GroupHeaderTemplateSelector = new MyDataTemplateSelector(),
 				ItemsSource = Data
 			};
 
@@ -72,7 +72,7 @@ namespace Xamarin.Forms.Controls.Issues
 		}
 
 		[Preserve(AllMembers = true)]
-		public class MyDataTemplateSelector : DataTemplateSelector
+		public class MyDataTemplateSelector : IDataTemplateSelector
 		{
 			readonly DataTemplate firstGroupTemplate;
 			readonly DataTemplate secondGroupTemplate;
@@ -83,7 +83,7 @@ namespace Xamarin.Forms.Controls.Issues
 				secondGroupTemplate = new DataTemplate(typeof(GroupHeaderTemplate));
 			}
 
-			protected override DataTemplate OnSelectTemplate(object item, BindableObject container)
+			public DataTemplate SelectTemplate(object item, BindableObject container)
 			{
 				if (!(item is GroupedData model))
 				{

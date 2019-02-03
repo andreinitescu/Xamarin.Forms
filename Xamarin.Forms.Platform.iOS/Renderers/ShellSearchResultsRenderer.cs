@@ -83,18 +83,19 @@ namespace Xamarin.Forms.Platform.iOS
 			int row = indexPath.Row;
 			var context = proxy[row];
 
-			var template = SearchHandler.ItemTemplate;
+			var template = DataTemplateExtensions.SelectDataTemplate(
+				SearchHandler.ItemTemplate, SearchHandler.ItemTemplateSelector, context, _context.Shell);
 
 			if (template == null)
 				template = DefaultTemplate;
 
-			var cellId = ((IDataTemplateController)template.SelectDataTemplate(context, _context.Shell)).IdString;
+			var cellId = ((IDataTemplateController)template).IdString;
 
 			var cell = (UIContainerCell)tableView.DequeueReusableCell(cellId);
 
 			if (cell == null)
 			{
-				var view = (View)template.CreateContent(context, _context.Shell);
+				var view = (View)template.CreateContent();
 				view.Parent = _context.Shell;
 				view.BindingContext = context;
 				cell = new UIContainerCell(cellId, view);

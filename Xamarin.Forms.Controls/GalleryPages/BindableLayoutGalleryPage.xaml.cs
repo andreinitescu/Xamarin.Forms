@@ -66,12 +66,12 @@ namespace Xamarin.Forms.Controls.GalleryPages
 		}
 	}
 
-	class BindableLayoutItemTemplateSelector : DataTemplateSelector
+	class BindableLayoutItemTemplateSelector : IDataTemplateSelector
 	{
 		public DataTemplate IntTemplate { get; set; }
 		public DataTemplate CharTemplate { get; set; }
 
-		protected override DataTemplate OnSelectTemplate(object item, BindableObject container)
+		public DataTemplate SelectTemplate(object item, BindableObject container)
 		{
 			return item is int ? IntTemplate : CharTemplate;
 		}

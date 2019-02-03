@@ -33,6 +33,7 @@ namespace Xamarin.Forms.Internals
 
 		readonly BindableProperty _itemSourceProperty;
 		readonly BindableProperty _itemTemplateProperty;
+		readonly BindableProperty _itemTemplateSelectorProperty;
 
 		readonly TView _itemsView;
 
@@ -42,10 +43,11 @@ namespace Xamarin.Forms.Internals
 		BindingBase _groupDisplayBinding;
 		OrderedDictionary<object, TemplatedItemsList<TView, TItem>> _groupedItems;
 		DataTemplate _groupHeaderTemplate;
+		IDataTemplateSelector _groupHeaderTemplateSelector;
 		BindingBase _groupShortNameBinding;
 		ShortNamesProxy _shortNames;
 
-		internal TemplatedItemsList(TView itemsView, BindableProperty itemSourceProperty, BindableProperty itemTemplateProperty)
+		internal TemplatedItemsList(TView itemsView, BindableProperty itemSourceProperty, BindableProperty itemTemplateProperty, BindableProperty itemTemplateSelectorProperty)
 		{
 			if (itemsView == null)
 				throw new ArgumentNullException("itemsView");
@@ -53,12 +55,15 @@ namespace Xamarin.Forms.Internals
 				throw new ArgumentNullException("itemSourceProperty");
 			if (itemTemplateProperty == null)
 				throw new ArgumentNullException("itemTemplateProperty");
+			if (itemTemplateSelectorProperty == null)
+				throw new ArgumentNullException("itemTemplateSelectorProperty");
 
 			_itemsView = itemsView;
 			_itemsView.PropertyChanged += BindableOnPropertyChanged;
 
 			_itemSourceProperty = itemSourceProperty;
 			_itemTemplateProperty = itemTemplateProperty;
+			_itemTemplateSelectorProperty = itemTemplateSelectorProperty;
 
 			IEnumerable source = GetItemsViewSource();
 			if (source != null)
@@ -126,7 +131,30 @@ namespace Xamarin.Forms.Internals
 			}
 		}
 
+		public IDataTemplateSelector GroupHeaderTemplateSelector
+		{
+			get
+			{
+				IDataTemplateSelector groupHeaderSelector = null;
+				if (GroupHeaderTemplateSelectorProperty != null)
+					groupHeaderSelector = (IDataTemplateSelector)_itemsView.GetValue(GroupHeaderTemplateSelectorProperty);
+
+				return groupHeaderSelector ?? _groupHeaderTemplateSelector;
+			}
+
+			set
+			{
+				if (_groupHeaderTemplateSelector == value)
+					return;
+
+				_groupHeaderTemplateSelector = value;
+				OnHeaderTemplateChanged();
+			}
+		}
+
 		public BindableProperty GroupHeaderTemplateProperty { get; set; }
+
+		public BindableProperty GroupHeaderTemplateSelectorProperty { get; set; }
 
 		public BindingBase GroupShortNameBinding
 		{
@@ -203,6 +231,11 @@ namespace Xamarin.Forms.Internals
 		DataTemplate ItemTemplate
 		{
 			get { return (DataTemplate)_itemsView.GetValue(_itemTemplateProperty); }
+		}
+
+		IDataTemplateSelector ItemTemplateSelector
+		{
+			get { return (IDataTemplateSelector)_itemsView.GetValue(_itemTemplateSelectorProperty); }
 		}
 
 		bool ProgressiveLoading
@@ -526,12 +559,12 @@ namespace Xamarin.Forms.Internals
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public DataTemplate SelectDataTemplate(object item)
 		{
-			return ItemTemplate.SelectDataTemplate(item, _itemsView);
+			return DataTemplateExtensions.SelectDataTemplate(ItemTemplate, ItemTemplateSelector, item, _itemsView);
 		}
 
 		public TItem ActivateContent(int index, object item)
 		{
-			TItem content = ItemTemplate != null ? (TItem)ItemTemplate.CreateContent(item, _itemsView) : _itemsView.CreateDefault(item);
+			TItem content = ItemTemplate != null ? (TItem)DataTemplateExtensions.CreateContent(ItemTemplate, ItemTemplateSelector, item, _itemsView) : _itemsView.CreateDefault(item);
 
 			content = UpdateContent(content, index, item);
 
@@ -664,6 +697,8 @@ namespace Xamarin.Forms.Internals
 			else if (ProgressiveLoadingProperty != null && e.PropertyName == ProgressiveLoadingProperty.PropertyName)
 				OnInfiniteScrollingChanged();
 			else if (GroupHeaderTemplateProperty != null && e.PropertyName == GroupHeaderTemplateProperty.PropertyName)
+				OnHeaderTemplateChanged();
+			else if (GroupHeaderTemplateSelectorProperty != null && e.PropertyName == GroupHeaderTemplateSelectorProperty.PropertyName)
 				OnHeaderTemplateChanged();
 			else if (IsGroupingEnabledProperty != null && e.PropertyName == IsGroupingEnabledProperty.PropertyName)
 				OnGroupingEnabledChanged();

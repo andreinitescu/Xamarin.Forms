@@ -23,10 +23,16 @@ namespace Xamarin.Forms
 		public static readonly BindableProperty HeaderTemplateProperty = BindableProperty.Create("HeaderTemplate", typeof(DataTemplate), typeof(ListView), null, propertyChanged: OnHeaderTemplateChanged,
 			validateValue: ValidateHeaderFooterTemplate);
 
+		public static readonly BindableProperty HeaderTemplateSelectorProperty = BindableProperty.Create("HeaderTemplateSelector", typeof(IDataTemplateSelector), typeof(ListView), null, propertyChanged: OnHeaderTemplateSelectorChanged,
+			validateValue: ValidateHeaderFooterTemplateSelector);
+
 		public static readonly BindableProperty FooterProperty = BindableProperty.Create("Footer", typeof(object), typeof(ListView), null, propertyChanged: OnFooterChanged);
 
 		public static readonly BindableProperty FooterTemplateProperty = BindableProperty.Create("FooterTemplate", typeof(DataTemplate), typeof(ListView), null, propertyChanged: OnFooterTemplateChanged,
 			validateValue: ValidateHeaderFooterTemplate);
+
+		public static readonly BindableProperty FooterTemplateSelectorProperty = BindableProperty.Create("FooterTemplateSelector", typeof(IDataTemplateSelector), typeof(ListView), null, propertyChanged: OnFooterTemplateSelectorChanged,
+			validateValue: ValidateHeaderFooterTemplateSelector);
 
 		public static readonly BindableProperty SelectedItemProperty = BindableProperty.Create("SelectedItem", typeof(object), typeof(ListView), null, BindingMode.OneWayToSource,
 			propertyChanged: OnSelectedItemChanged);
@@ -39,6 +45,9 @@ namespace Xamarin.Forms
 
 		public static readonly BindableProperty GroupHeaderTemplateProperty = BindableProperty.Create("GroupHeaderTemplate", typeof(DataTemplate), typeof(ListView), null,
 			propertyChanged: OnGroupHeaderTemplateChanged);
+
+		public static readonly BindableProperty GroupHeaderTemplateSelectorProperty = BindableProperty.Create("GroupHeaderTemplateSelector", typeof(IDataTemplateSelector), typeof(ListView), null,
+			propertyChanged: OnGroupHeaderTemplateSelectorChanged);
 
 		public static readonly BindableProperty IsGroupingEnabledProperty = BindableProperty.Create("IsGroupingEnabled", typeof(bool), typeof(ListView), false);
 
@@ -102,6 +111,12 @@ namespace Xamarin.Forms
 			set { SetValue(FooterTemplateProperty, value); }
 		}
 
+		public IDataTemplateSelector FooterTemplateSelector
+		{
+			get { return (IDataTemplateSelector)GetValue(FooterTemplateSelectorProperty); }
+			set { SetValue(FooterTemplateSelectorProperty, value); }
+		}
+
 		protected override void OnBindingContextChanged()
 		{
 			base.OnBindingContextChanged();
@@ -144,6 +159,12 @@ namespace Xamarin.Forms
 			set { SetValue(GroupHeaderTemplateProperty, value); }
 		}
 
+		public IDataTemplateSelector GroupHeaderTemplateSelector
+		{
+			get { return (IDataTemplateSelector)GetValue(GroupHeaderTemplateSelectorProperty); }
+			set { SetValue(GroupHeaderTemplateSelectorProperty, value); }
+		}
+
 		public BindingBase GroupShortNameBinding
 		{
 			get { return _groupShortNameBinding; }
@@ -175,6 +196,12 @@ namespace Xamarin.Forms
 		{
 			get { return (DataTemplate)GetValue(HeaderTemplateProperty); }
 			set { SetValue(HeaderTemplateProperty, value); }
+		}
+
+		public IDataTemplateSelector HeaderTemplateSelector
+		{
+			get { return (IDataTemplateSelector)GetValue(HeaderTemplateSelectorProperty); }
+			set { SetValue(HeaderTemplateSelectorProperty, value); }
 		}
 
 		public bool IsGroupingEnabled
@@ -481,13 +508,19 @@ namespace Xamarin.Forms
 		static void OnFooterChanged(BindableObject bindable, object oldValue, object newValue)
 		{
 			var lv = (ListView)bindable;
-			lv.OnHeaderOrFooterChanged(ref lv._footerElement, "FooterElement", newValue, lv.FooterTemplate, false);
+			lv.OnHeaderOrFooterChanged(ref lv._footerElement, "FooterElement", newValue, lv.FooterTemplate, lv.FooterTemplateSelector, false);
 		}
 
 		static void OnFooterTemplateChanged(BindableObject bindable, object oldValue, object newValue)
 		{
 			var lv = (ListView)bindable;
-			lv.OnHeaderOrFooterChanged(ref lv._footerElement, "FooterElement", lv.Footer, (DataTemplate)newValue, true);
+			lv.OnHeaderOrFooterChanged(ref lv._footerElement, "FooterElement", lv.Footer, (DataTemplate)newValue, lv.FooterTemplateSelector, true);
+		}
+
+		static void OnFooterTemplateSelectorChanged(BindableObject bindable, object oldValue, object newValue)
+		{
+			var lv = (ListView)bindable;
+			lv.OnHeaderOrFooterChanged(ref lv._footerElement, "FooterElement", lv.Footer, lv.FooterTemplate, (IDataTemplateSelector)newValue, true);
 		}
 
 		static void OnGroupDisplayBindingChanged(BindableObject bindable, BindingBase oldValue, BindingBase newValue)
@@ -510,13 +543,23 @@ namespace Xamarin.Forms
 			}
 		}
 
+		static void OnGroupHeaderTemplateSelectorChanged(BindableObject bindable, object oldvalue, object newValue)
+		{
+			var lv = (ListView)bindable;
+			if (newValue != null && lv.GroupDisplayBinding != null)
+			{
+				lv.GroupDisplayBinding = null;
+				Log.Warning("ListView", "GroupHeaderTemplateSelector and GroupDisplayBinding can not be set at the same time, setting GroupDisplayBinding to null");
+			}
+		}
+
 		static void OnHeaderChanged(BindableObject bindable, object oldValue, object newValue)
 		{
 			var lv = (ListView)bindable;
-			lv.OnHeaderOrFooterChanged(ref lv._headerElement, "HeaderElement", newValue, lv.HeaderTemplate, false);
+			lv.OnHeaderOrFooterChanged(ref lv._headerElement, "HeaderElement", newValue, lv.HeaderTemplate, lv.HeaderTemplateSelector, false);
 		}
 
-		void OnHeaderOrFooterChanged(ref Element storage, string property, object dataObject, DataTemplate template, bool templateChanged)
+		void OnHeaderOrFooterChanged(ref Element storage, string property, object dataObject, DataTemplate template, IDataTemplateSelector dataTemplateSelector, bool templateChanged)
 		{
 			if (dataObject == null)
 			{
@@ -561,7 +604,13 @@ namespace Xamarin.Forms
 		static void OnHeaderTemplateChanged(BindableObject bindable, object oldValue, object newValue)
 		{
 			var lv = (ListView)bindable;
-			lv.OnHeaderOrFooterChanged(ref lv._headerElement, "HeaderElement", lv.Header, (DataTemplate)newValue, true);
+			lv.OnHeaderOrFooterChanged(ref lv._headerElement, "HeaderElement", lv.Header, (DataTemplate)newValue, lv.HeaderTemplateSelector, true);
+		}
+
+		static void OnHeaderTemplateSelectorChanged(BindableObject bindable, object oldValue, object newValue)
+		{
+			var lv = (ListView)bindable;
+			lv.OnHeaderOrFooterChanged(ref lv._headerElement, "HeaderElement", lv.Header, lv.HeaderTemplate, (IDataTemplateSelector)newValue, true);
 		}
 
 		static void OnRefreshCommandChanged(BindableObject bindable, object oldValue, object newValue)
@@ -613,11 +662,10 @@ namespace Xamarin.Forms
 			return _platformConfigurationRegistry.Value.On<T>();
 		}
 
-		protected override bool ValidateItemTemplate(DataTemplate template)
+		protected override bool ValidateItemTemplateSelector(IDataTemplateSelector templateSelector)
 		{
 			var isRetainStrategy = CachingStrategy == ListViewCachingStrategy.RetainElement;
-			var isDataTemplateSelector = ItemTemplate is DataTemplateSelector;
-			if (isRetainStrategy && isDataTemplateSelector)
+			if (isRetainStrategy && templateSelector != null)
 				return false;
 
 			return true;

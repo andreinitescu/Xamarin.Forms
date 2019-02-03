@@ -37,7 +37,7 @@ namespace Xamarin.Forms.Controls.Issues
 
 			var aacountListView = new ListView();
 			aacountListView.HasUnevenRows = true;
-			aacountListView.ItemTemplate = new AccountDetailsDataTemplateSelector();
+			aacountListView.ItemTemplateSelector = new AccountDetailsDataTemplateSelector();
 			aacountListView.BindingContext = new List<RecommendationsViewModel> { new RecommendationsViewModel() };
 
 			aacountListView.SetBinding(ListView.ItemsSourceProperty, ".");
@@ -181,7 +181,7 @@ namespace Xamarin.Forms.Controls.Issues
 	}
 
 	[Preserve(AllMembers = true)]
-	public class AccountDetailsDataTemplateSelector : DataTemplateSelector
+	public class AccountDetailsDataTemplateSelector : IDataTemplateSelector
 	{
 		public Lazy<DataTemplate> RecommendationsViewDataTemplate { get; }
 		public Lazy<ViewCell> RecommendationsView { get; }
@@ -199,7 +199,7 @@ namespace Xamarin.Forms.Controls.Issues
 			RecommendationsViewDataTemplate2 = new Lazy<DataTemplate>(() => new DataTemplate(() => RecommendationsView2.Value));
 		}
 
-		protected override DataTemplate OnSelectTemplate(object item, BindableObject container)
+		public DataTemplate SelectTemplate(object item, BindableObject container)
 		{
 			if (item == null)
 			{

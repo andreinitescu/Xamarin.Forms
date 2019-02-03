@@ -162,6 +162,7 @@ namespace Xamarin.Forms.Platform.Android
 			if (itemTemplate == null)
 				return DefaultItemTemplateId;
 
+			IDataTemplateSelector itemTemplateSelector = null;
 			if (itemTemplate is DataTemplateSelector selector)
 			{
 				object item = null;
@@ -710,7 +711,8 @@ namespace Xamarin.Forms.Platform.Android
 
 		Cell GetNewGroupHeaderCell(ITemplatedItemsList<Cell> group)
 		{
-			var groupHeaderCell = _listView.TemplatedItems.GroupHeaderTemplate?.CreateContent(group.ItemsSource, _listView) as Cell;
+			var groupHeaderCell = DataTemplateExtensions.CreateContent(
+				_listView.TemplatedItems.GroupHeaderTemplate, _listView.TemplatedItems.GroupHeaderTemplateSelector, group.ItemsSource, _listView) as Cell;
 
 			if (groupHeaderCell != null)
 			{

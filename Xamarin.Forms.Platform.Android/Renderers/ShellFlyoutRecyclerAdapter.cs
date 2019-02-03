@@ -46,12 +46,18 @@ namespace Xamarin.Forms.Platform.Android
 		{
 			var item = _listItems[position];
 			var dataTemplate = Shell.ItemTemplate ?? DefaultItemTemplate;
+
 			if (item.Element is MenuItem)
 			{
-				dataTemplate = Shell.MenuItemTemplate ?? DefaultMenuItemTemplate;
+				dataTemplate = DataTemplateExtensions.SelectDataTemplate(
+					Shell.MenuItemTemplate, Shell.MenuItemTemplateSelector, item, Shell);
+				dataTemplate = dataTemplate ?? DefaultMenuItemTemplate;
 			}
 
-			var template = dataTemplate.SelectDataTemplate(item.Element, Shell);
+			var template = dataTemplate ?? DataTemplateExtensions.SelectDataTemplate(
+				Shell.ItemTemplate, Shell.ItemTemplateSelector, item.Element, Shell);
+			template = template ?? DefaultItemTemplate;
+
 			var id = ((IDataTemplateController)template).Id;
 
 			_templateMap[id] = template;

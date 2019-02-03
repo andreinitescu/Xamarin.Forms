@@ -26,7 +26,7 @@ namespace Xamarin.Forms.Controls.Issues
 			{
 				listView = new ListView(ListViewCachingStrategy.RetainElement) { HasUnevenRows = true };
 				listView.IsGroupingEnabled = true;
-				listView.ItemTemplate = new GroupedItemsDataTemplateSelector();
+				listView.ItemTemplateSelector = new GroupedItemsDataTemplateSelector();
 
 				var headerCell = new DataTemplate(typeof(TextCell));
 				headerCell.SetBinding(TextCell.TextProperty, "Key");
@@ -72,7 +72,7 @@ namespace Xamarin.Forms.Controls.Issues
 			}
 		}
 		[Preserve(AllMembers = true)]
-		public class GroupedItemsDataTemplateSelector : Xamarin.Forms.DataTemplateSelector
+		public class GroupedItemsDataTemplateSelector : Xamarin.Forms.IDataTemplateSelector
 		{
 			private readonly DataTemplate firstGroupTemplate;
 			private readonly DataTemplate secondGroupTemplate;
@@ -89,7 +89,7 @@ namespace Xamarin.Forms.Controls.Issues
 				this.secondGroupTemplate = secondTemplate;
 			}
 
-			protected override DataTemplate OnSelectTemplate(object item, BindableObject container)
+			public DataTemplate SelectTemplate(object item, BindableObject container)
 			{
 				var model = item as GroupedItem;
 

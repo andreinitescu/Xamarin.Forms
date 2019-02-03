@@ -140,7 +140,7 @@ namespace Xamarin.Forms.Controls.Issues
 			}
 		}
 
-		class MyDataTemplateSelector : DataTemplateSelector
+		class MyDataTemplateSelector : IDataTemplateSelector
 		{
 			DataTemplate _fizzbuzz;
 			DataTemplate _fizz;
@@ -155,7 +155,7 @@ namespace Xamarin.Forms.Controls.Issues
 				_number = new DataTemplate(() => new Number(vm));
 			}
 
-			protected override DataTemplate OnSelectTemplate(object item, BindableObject container)
+			public DataTemplate SelectTemplate(object item, BindableObject container)
 			{
 				int number = (int)item;
 
@@ -198,7 +198,7 @@ namespace Xamarin.Forms.Controls.Issues
 				// or none of the cells when possible.
 				RowHeight = 50, 
 				ItemsSource = Enumerable.Range(1, 5001),
-				ItemTemplate = new MyDataTemplateSelector(vm)
+				ItemTemplateSelector = new MyDataTemplateSelector(vm)
 			};
 			Content = new StackLayout { Children = { new Label { Text = Instructions }, label, _timeLabel, _listView } };
 		}

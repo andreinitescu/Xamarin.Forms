@@ -1325,7 +1325,7 @@ namespace Xamarin.Forms.Platform.iOS
 			int TemplateIdForPath(NSIndexPath indexPath)
 			{
 				var itemTemplate = List.ItemTemplate;
-				var selector = itemTemplate as DataTemplateSelector;
+				var selector = List.ItemTemplateSelector;
 				if (selector == null)
 					return DefaultItemTemplateId;
 

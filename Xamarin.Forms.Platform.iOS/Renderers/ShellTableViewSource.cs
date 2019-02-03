@@ -54,20 +54,24 @@ namespace Xamarin.Forms.Platform.iOS
 			DataTemplate template = null;
 			if (context is MenuItem)
 			{
-				template = _context.Shell.MenuItemTemplate ?? DefaultMenuItemTemplate;
+				template = DataTemplateExtensions.SelectDataTemplate(
+					_context.Shell.MenuItemTemplate, _context.Shell.MenuItemTemplateSelector, context, _context.Shell);
+				template = template ?? DefaultMenuItemTemplate;
 			}
 			else
 			{
-				template = _context.Shell.ItemTemplate ?? DefaultItemTemplate;
+				template = DataTemplateExtensions.SelectDataTemplate(
+					_context.Shell.ItemTemplate, _context.Shell.ItemTemplateSelector, context, _context.Shell);
+				template = template ?? DefaultItemTemplate;
 			}
 
-			var cellId = ((IDataTemplateController)template.SelectDataTemplate(context, _context.Shell)).IdString;
+			var cellId = ((IDataTemplateController)template).IdString;
 
 			var cell = (UIContainerCell)tableView.DequeueReusableCell(cellId);
 
 			if (cell == null)
 			{
-				var view = (View)template.CreateContent(context, _context.Shell);
+				var view = (View)template.CreateContent();
 				view.Parent = _context.Shell;
 				cell = new UIContainerCell(cellId, view);
 				cell.BindingContext = context;

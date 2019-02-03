@@ -22,7 +22,7 @@ namespace Xamarin.Forms.Controls.Issues
 	{
 		const string Success = "Success";
 
-		class MyDataTemplateSelector : DataTemplateSelector
+		class MyDataTemplateSelector : IDataTemplateSelector
 		{
 			readonly DataTemplate one;
 			readonly DataTemplate two;
@@ -69,7 +69,7 @@ namespace Xamarin.Forms.Controls.Issues
 				twenty = new DataTemplate(() => new ViewCell { View = new Label { Text = Success } });
 			}
 
-			protected override DataTemplate OnSelectTemplate(object item, BindableObject container)
+			public DataTemplate SelectTemplate(object item, BindableObject container)
 			{
 				var val = (int)item;
 
@@ -126,7 +126,7 @@ namespace Xamarin.Forms.Controls.Issues
 			var listView = new ListView
 			{
 				ItemsSource = Enumerable.Range(0, 100),
-				ItemTemplate = dts
+				ItemTemplateSelector = dts
 			};
 
 			var layout = new StackLayout { Children = { listView } };

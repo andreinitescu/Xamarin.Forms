@@ -541,10 +541,16 @@ namespace Xamarin.Forms
 		public static readonly BindableProperty ItemTemplateProperty =
 			BindableProperty.Create(nameof(ItemTemplate), typeof(DataTemplate), typeof(Shell), null, BindingMode.OneTime);
 
+		public static readonly BindableProperty ItemTemplateSelectorProperty =
+			BindableProperty.Create(nameof(ItemTemplateSelector), typeof(IDataTemplateSelector), typeof(Shell), null, BindingMode.OneTime);
+
 		public static readonly BindableProperty MenuItemsProperty = MenuItemsPropertyKey.BindableProperty;
 
 		public static readonly BindableProperty MenuItemTemplateProperty =
 			BindableProperty.Create(nameof(MenuItemTemplate), typeof(DataTemplate), typeof(Shell), null, BindingMode.OneTime);
+
+		public static readonly BindableProperty MenuItemTemplateSelectorProperty =
+			BindableProperty.Create(nameof(MenuItemTemplateSelector), typeof(IDataTemplateSelector), typeof(Shell), null, BindingMode.OneTime);
 
 		ShellNavigatedEventArgs _accumulatedEvent;
 		bool _accumulateNavigatedEvents;
@@ -616,11 +622,23 @@ namespace Xamarin.Forms
 			set => SetValue(ItemTemplateProperty, value);
 		}
 
+		public IDataTemplateSelector ItemTemplateSelector
+		{
+			get => (IDataTemplateSelector)GetValue(ItemTemplateSelectorProperty);
+			set => SetValue(ItemTemplateSelectorProperty, value);
+		}
+
 		public MenuItemCollection MenuItems => (MenuItemCollection)GetValue(MenuItemsProperty);
 
 		public DataTemplate MenuItemTemplate {
 			get => (DataTemplate)GetValue(MenuItemTemplateProperty);
 			set => SetValue(MenuItemTemplateProperty, value);
+		}
+
+		public IDataTemplateSelector MenuItemTemplateSelector
+		{
+			get => (IDataTemplateSelector)GetValue(MenuItemTemplateSelectorProperty);
+			set => SetValue(MenuItemTemplateSelectorProperty, value);
 		}
 
 		public string Route {

@@ -22,7 +22,7 @@ namespace Xamarin.Forms.Controls.Issues
 		const string Success5 = "GroupedSuccess5";
 		const string Success6 = "GroupedSuccess6";
 
-		class MyDataTemplateSelector : DataTemplateSelector
+		class MyDataTemplateSelector : IDataTemplateSelector
 		{
 			DataTemplate _1Template;
 			DataTemplate _2Template;
@@ -65,7 +65,7 @@ namespace Xamarin.Forms.Controls.Issues
 				});
 			}
 
-			protected override DataTemplate OnSelectTemplate(object item, BindableObject container)
+			public DataTemplate SelectTemplate(object item, BindableObject container)
 			{
 				int number = (int)item;
 				switch (number)
@@ -87,7 +87,7 @@ namespace Xamarin.Forms.Controls.Issues
 			ListView listView = new ListView(ListViewCachingStrategy.RecycleElement)
 			{
 				ItemsSource = Enumerable.Range(0, 2),
-				ItemTemplate = new MyDataTemplateSelector()
+				ItemTemplateSelector = new MyDataTemplateSelector()
 			};
 
 			//test grouped DTS
@@ -95,7 +95,7 @@ namespace Xamarin.Forms.Controls.Issues
 			{
 				ItemsSource = new List<List<int>> { Enumerable.Range(2, 2).ToList(), Enumerable.Range(4, 2).ToList() },
 				IsGroupingEnabled = true,
-				ItemTemplate = new MyDataTemplateSelector()
+				ItemTemplateSelector = new MyDataTemplateSelector()
 			};
 
 			Content = new StackLayout { Children = { listView, groupedListView } };

@@ -198,8 +198,8 @@ namespace Xamarin.Forms.Platform.MacOS
 		int TemplateIdForPath(NSIndexPath indexPath)
 		{
 			var itemTemplate = List.ItemTemplate;
-			var selector = itemTemplate as DataTemplateSelector;
-			if (selector == null)
+			var selector = List.ItemTemplateSelector;
+			if (itemTemplate == null && selector == null)
 				return DefaultItemTemplateId;
 
 			var templatedList = TemplatedItemsView.TemplatedItems;
@@ -208,7 +208,7 @@ namespace Xamarin.Forms.Platform.MacOS
 
 			var item = templatedList.ListProxy[(int)indexPath.Item];
 
-			itemTemplate = selector.SelectTemplate(item, List);
+			itemTemplate = DataTemplateExtensions.SelectDataTemplate(itemTemplate, selector, item, List);
 			int key;
 			if (!_templateToId.TryGetValue(itemTemplate, out key))
 			{

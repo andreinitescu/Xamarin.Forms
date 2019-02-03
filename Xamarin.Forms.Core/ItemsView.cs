@@ -24,8 +24,12 @@ namespace Xamarin.Forms
 			BindableProperty.Create(nameof(ItemTemplate), typeof(DataTemplate), typeof(ItemsView<TVisual>), null,
 									validateValue: (b, v) => ((ItemsView<TVisual>)b).ValidateItemTemplate((DataTemplate)v));
 
+		public static readonly BindableProperty ItemTemplateSelectorProperty =
+			BindableProperty.Create(nameof(ItemTemplate), typeof(IDataTemplateSelector), typeof(ItemsView<TVisual>), null,
+							validateValue: (b, v) => ((ItemsView<TVisual>)b).ValidateItemTemplateSelector((IDataTemplateSelector)v));
+
 		internal ItemsView()
-			=> TemplatedItems = new TemplatedItemsList<ItemsView<TVisual>, TVisual>(this, ItemsSourceProperty, ItemTemplateProperty);
+			=> TemplatedItems = new TemplatedItemsList<ItemsView<TVisual>, TVisual>(this, ItemsSourceProperty, ItemTemplateProperty, ItemTemplateSelectorProperty);
 
 		public IEnumerable ItemsSource {
 			get => (IEnumerable)GetValue(ItemsSourceProperty);
@@ -35,6 +39,12 @@ namespace Xamarin.Forms
 		public DataTemplate ItemTemplate {
 			get => (DataTemplate)GetValue(ItemTemplateProperty);
 			set => SetValue(ItemTemplateProperty, value);
+		}
+
+		public IDataTemplateSelector ItemTemplateSelector
+		{
+			get => (IDataTemplateSelector)GetValue(ItemTemplateSelectorProperty);
+			set => SetValue(ItemTemplateSelectorProperty, value);
 		}
 
 		/*public void UpdateNonNotifyingList()
@@ -74,5 +84,7 @@ namespace Xamarin.Forms
 		}
 
 		protected virtual bool ValidateItemTemplate(DataTemplate template) => true;
+
+		protected virtual bool ValidateItemTemplateSelector(IDataTemplateSelector templateSelector) => true;
 	}
 }

@@ -104,6 +104,9 @@ namespace Xamarin.Forms
 		public static readonly BindableProperty ItemTemplateProperty =
 			BindableProperty.Create(nameof(ItemTemplate), typeof(DataTemplate), typeof(SearchHandler), null, BindingMode.OneTime);
 
+		public static readonly BindableProperty ItemTemplateSelectorProperty =
+			BindableProperty.Create(nameof(ItemTemplateSelector), typeof(IDataTemplateSelector), typeof(SearchHandler), null, BindingMode.OneTime);
+
 		public static readonly BindableProperty PlaceholderProperty =
 			BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(SearchHandler), null, BindingMode.OneTime);
 
@@ -219,6 +222,11 @@ namespace Xamarin.Forms
 		{
 			get { return (DataTemplate)GetValue(ItemTemplateProperty); }
 			set { SetValue(ItemTemplateProperty, value); }
+		}
+		public IDataTemplateSelector ItemTemplateSelector
+		{
+			get { return (IDataTemplateSelector)GetValue(ItemTemplateSelectorProperty); }
+			set { SetValue(ItemTemplateSelectorProperty, value); }
 		}
 
 		public string Placeholder

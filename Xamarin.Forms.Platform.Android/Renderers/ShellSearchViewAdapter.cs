@@ -93,8 +93,8 @@ namespace Xamarin.Forms.Platform.Android
 			}
 			else
 			{
-				var template = _searchHandler.ItemTemplate ?? DefaultTemplate;
-				var view = (View)template.CreateContent(item, _shellContext.Shell);
+				var template = DataTemplateExtensions.SelectDataTemplate(_searchHandler.ItemTemplate, _searchHandler.ItemTemplateSelector, item, _shellContext.Shell) ?? DefaultTemplate;
+				var view = (View)template.CreateContent();
 				view.BindingContext = item;
 
 				result = new ContainerView(parent.Context, view);

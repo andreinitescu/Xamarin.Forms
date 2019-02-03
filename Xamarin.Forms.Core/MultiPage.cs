@@ -17,6 +17,8 @@ namespace Xamarin.Forms
 
 		public static readonly BindableProperty ItemTemplateProperty = BindableProperty.Create("ItemTemplate", typeof(DataTemplate), typeof(MultiPage<>), null);
 
+		public static readonly BindableProperty ItemTemplateSelectorProperty = BindableProperty.Create("ItemTemplateSelector", typeof(IDataTemplateSelector), typeof(MultiPage<>), null);
+
 		public static readonly BindableProperty SelectedItemProperty = BindableProperty.Create("SelectedItem", typeof(object), typeof(MultiPage<>), null, BindingMode.TwoWay);
 
 		internal static readonly BindableProperty IndexProperty = BindableProperty.Create("Index", typeof(int), typeof(Page), -1);
@@ -28,7 +30,7 @@ namespace Xamarin.Forms
 
 		protected MultiPage()
 		{
-			_templatedItems = new TemplatedItemsList<MultiPage<T>, T>(this, ItemsSourceProperty, ItemTemplateProperty);
+			_templatedItems = new TemplatedItemsList<MultiPage<T>, T>(this, ItemsSourceProperty, ItemTemplateProperty, ItemTemplateSelectorProperty);
 			_templatedItems.CollectionChanged += OnTemplatedItemsChanged;
 
 			_children = new ElementCollection<T>(InternalChildren);
@@ -45,6 +47,11 @@ namespace Xamarin.Forms
 		{
 			get { return (DataTemplate)GetValue(ItemTemplateProperty); }
 			set { SetValue(ItemTemplateProperty, value); }
+		}
+		public IDataTemplateSelector ItemTemplateSelector
+		{
+			get { return (IDataTemplateSelector)GetValue(ItemTemplateSelectorProperty); }
+			set { SetValue(ItemTemplateSelectorProperty, value); }
 		}
 
 		public object SelectedItem
