@@ -129,7 +129,21 @@ namespace Xamarin.Forms
 				((IStyle)basedOn).Apply(bindable);
 
 			foreach (Setter setter in Setters)
-				setter.Apply(bindable, true);
+			{
+				try
+				{
+					setter.Apply(bindable, true);
+				}
+				catch (Exception ex)
+				{
+					if (!TargetType.IsAssignableFrom(bindable.GetType()))
+						throw new ArgumentException(
+							$"Style TargetType {TargetType.FullName} is not compatible with element target type {bindable.GetType()}", ex);
+					else
+						throw;
+				}
+			}
+
 			((AttachedCollection<Behavior>)Behaviors).AttachTo(bindable);
 			((AttachedCollection<TriggerBase>)Triggers).AttachTo(bindable);
 		}

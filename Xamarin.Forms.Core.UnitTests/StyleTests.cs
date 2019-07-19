@@ -827,28 +827,33 @@ namespace Xamarin.Forms.Core.UnitTests
 		{
 		}
 
-		[Test]
-		public void MismatchTargetTypeThrowsError1()
-		{
-			var s = new Style(typeof(Button));
-			var t = new View();
-			Assert.Throws<ArgumentException>(() => t.Style = s);
-		}
 
 		[Test]
-		public void MismatchTargetTypeThrowsError2()
+		public void MismatchTargetTypeThrowsError3()
 		{
-			var s = new Style(typeof(Button));
+			var s = new Style(typeof(Page));
+			s.Setters.Add(new Setter() { Property = Page.PaddingProperty, Value = 10 });
+
 			var t = new Label();
 			Assert.Throws<ArgumentException>(() => t.Style = s);
 		}
 
 		[Test]
-		public void MatchTargetTypeDoesntThrowError()
+		public void MatchTargetTypeDoesntThrowError1()
 		{
 			var s = new Style(typeof(View));
 			var t = new Button();
 			Assert.DoesNotThrow(() => t.Style = s);
     	}
+
+		[Test]
+		public void MatchTargetTypeDoesntThrowError2()
+		{
+			var span = new Span() { Style = new Style(typeof(Span)) };
+			var ft = new FormattedString();
+			ft.Spans.Add(span);
+			var l = new Label();
+			Assert.DoesNotThrow(() => l.FormattedText = ft);
+		}
 	}
 }
